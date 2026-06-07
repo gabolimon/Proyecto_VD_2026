@@ -154,11 +154,11 @@ st.divider()
 # ============================================================
 # TABS
 # ============================================================
-tab1, tab2, tab3, tab4 = st.tabs([
-    "Salud Mental",
-    "Uso Digital",
-    "Gratificación Inmediata",
-    "Sueño y Fatiga"
+tab1 = st.tabs([
+    "Salud Mental"
+    #"Uso Digital",
+    #"Gratificación Inmediata",
+    #"Sueño y Fatiga"
 ])
 
 with tab1:
