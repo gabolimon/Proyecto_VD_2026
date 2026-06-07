@@ -71,6 +71,23 @@ def render(mh_f):
     col1, col2 = st.columns(2)
 
     with col1:
+        indicador_col1 = st.selectbox(
+            "Selecciona un indicador",
+            options=[
+                "puntaje_ansiedad",
+                "puntaje_depresion",
+                "nivel_estres",
+                "indice_soledad"
+            ],
+            format_func=lambda x: {
+                "puntaje_ansiedad" : "Ansiedad",
+                "puntaje_depresion": "Depresión",
+                "nivel_estres"     : "Estrés",
+                "indice_soledad"   : "Soledad"
+            }[x],
+            key="dropdown_indicador_col1"
+        )
+
         riesgo = (
             mh_f["riesgo_salud_mental"]
             .value_counts()
@@ -78,20 +95,28 @@ def render(mh_f):
         )
         riesgo.columns = ["riesgo_salud_mental", "cantidad"]
 
-        fig_riesgo = px.bar(
-            riesgo,
+        indicador_por_riesgo = (
+            mh_f.groupby("riesgo_salud_mental")[indicador_col1]
+            .mean()
+            .round(2)
+            .reset_index()
+        )
+        indicador_por_riesgo.columns = ["riesgo_salud_mental", "promedio"]
+
+        fig = px.bar(
+            indicador_por_riesgo,
             x="riesgo_salud_mental",
-            y="cantidad",
+            y="promedio",
             color="riesgo_salud_mental",
-            title="Nivel de Riesgo de Salud Mental",
+            title=f"Nivel de Riesgo vs {indicador_col1.replace('_', ' ').title()}",
             color_discrete_sequence=["#4A90E2", "#7FB77E", "#B8A1E3"]
         )
-        fig_riesgo.update_layout(
+        fig.update_layout(
             showlegend=False,
             xaxis_title="Nivel de Riesgo",
-            yaxis_title="Número de Usuarios"
+            yaxis_title="Promedio"
         )
-        st.plotly_chart(fig_riesgo, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True)
 
     with col2:
         # Dropdown para seleccionar indicador
