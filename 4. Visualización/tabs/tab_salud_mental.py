@@ -71,49 +71,27 @@ def render(mh_f):
     col1, col2 = st.columns(2)
 
     with col1:
-        # Dropdown para seleccionar plataforma
-        plataforma_seleccionada = st.selectbox(
-            "Selecciona una plataforma",
-            options=sorted(mh_f["plataforma"].unique()),
-            key="dropdown_plataforma_salud"
+        riesgo = (
+            mh_f["riesgo_salud_mental"]
+            .value_counts()
+            .reset_index()
         )
+        riesgo.columns = ["riesgo_salud_mental", "cantidad"]
 
-        df_plataforma = mh_f[mh_f["plataforma"] == plataforma_seleccionada]
-
-        indicadores_plat = pd.DataFrame({
-            "Indicador": ["Ansiedad", "Depresión", "Estrés", "Soledad"],
-            "Promedio": [
-                df_plataforma["puntaje_ansiedad"].mean(),
-                df_plataforma["puntaje_depresion"].mean(),
-                df_plataforma["nivel_estres"].mean(),
-                df_plataforma["indice_soledad"].mean()
-            ]
-        })
-
-        fig = px.bar(
-            indicadores_plat,
-            x="Indicador",
-            y="Promedio",
-            color="Indicador",
-            title=f"Indicadores psicológicos — {plataforma_seleccionada}",
-            labels={
-                "Indicador": "Indicador",
-                "Promedio" : "Promedio"
-            },
-            color_discrete_map={
-                "Ansiedad" : "#1E3A8A",
-                "Depresión": "#65A30D",
-                "Estrés"   : "#9333EA",
-                "Soledad"  : "#707070"
-            }
+        fig_riesgo = px.bar(
+            riesgo,
+            x="riesgo_salud_mental",
+            y="cantidad",
+            color="riesgo_salud_mental",
+            title="Nivel de Riesgo de Salud Mental",
+            color_discrete_sequence=["#4A90E2", "#7FB77E", "#B8A1E3"]
         )
-
-        fig.update_layout(
+        fig_riesgo.update_layout(
             showlegend=False,
-            yaxis_range=[0, 100]
+            xaxis_title="Nivel de Riesgo",
+            yaxis_title="Número de Usuarios"
         )
-
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig_riesgo, use_container_width=True)
 
     with col2:
         # Dropdown para seleccionar indicador
